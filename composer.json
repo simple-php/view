@@ -13,8 +13,8 @@
         "php": ">=5.4"
     },
     "autoload": {
-        "psr-4": {
+        "psr-0": {
             "SimplePHP\\View": "/View.php"
         }
-    } 
+    }
 }
