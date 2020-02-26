@@ -1,0 +1,20 @@
+{
+    "name": "simple-php/view",
+    "description": "Simple PHP native template engine",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Puchkin Dmitriy",
+            "email": "pdima88@mail.ru"
+        }
+    ],
+    "require": {
+        "php": ">=5.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "SimplePHP\\View": "/View.php"
+        }
+    } 
+}
