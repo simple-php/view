@@ -1,7 +1,7 @@
 <?php
 namespace SimplePHP\View;
 
-trait DataTrait {    
+trait DataTrait {       
     protected $_data = [];
 
     function __set($name, $value)
@@ -17,12 +17,16 @@ trait DataTrait {
         return null;        
     }
 
-    function setData($data, $append = false) {
-        if ($append) {
-            $this->_data += $data;
+    function addData($data, $replace = true) {
+        if ($replace) {
+            $this->_data = array_replace($this->_data, $data);
         } else {
-            $this->_data = $data;
+            $this->_data += $data;
         }
+    }
+
+    function setData($data) {
+        $this->_data = $data;
     }
 
     function resetData() {        
