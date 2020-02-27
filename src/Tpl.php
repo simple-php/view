@@ -1,14 +1,17 @@
 <?php
-namespace SimplePHP;
+namespace SimplePHP\View;
 
 use ArrayAccess;
 use Exception;
 
-class View implements ArrayAccess {
+class Tpl implements ArrayAccess {
+    use DataTrait { 
+        __get as private _dataTrait_get; 
+        offsetExists as private _dataTrait_offsetExists;
+    }
     protected $_tplPath = null;
     protected $_tplName = false;
     protected $_tplExt = '.phtml';
-    protected $_data = [];
     protected $_layoutPath = null;
     protected $_layout = false;
     protected $_content = '';
@@ -22,9 +25,11 @@ class View implements ArrayAccess {
         $this->_tplName = $tpl;
     }
 
-    function __set($name, $value)
+    #region overloaded DataTrait methods
+
+    public function offsetExists($offset)
     {
-        $this->_data[$name] = $value;
+        return isset($this->_data[$offset]) || isset(self::$_global[$offset]);
     }
 
     function __get($name)
@@ -37,16 +42,10 @@ class View implements ArrayAccess {
         return null;        
     }
 
-    function setData($data) {
-        $this->_data = $data;
-    }
+    #endregion
 
     function setGlobal($name, $value) {
         self::$_global[$name] = $value;
-    }
-
-    function reset() {        
-        $this->_data = [];
     }
 
     function getTemplatePath() {
@@ -114,28 +113,4 @@ class View implements ArrayAccess {
     {
         return $this->render();        
     }
-
-    #region ArrayAccess interface implementation
-
-    public function offsetExists($offset)
-    {
-        return isset($this->_data[$offset]) || isset(self::$_global[$offset]);
-    }
-
-    public function offsetGet($offset)
-    {
-        return $this->__get($offset);
-    }
-
-    public function offsetSet($offset, $value)
-    {
-        $this->__set($offset, $value);
-    }
-
-    public function offsetUnset($offset)
-    {
-        unset($this->_data[$offset]);
-    }
-
-    #endregion
 }

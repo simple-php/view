@@ -13,6 +13,8 @@
         "php": ">=5.4"
     },
     "autoload": {
-        "classmap": ["View.php"]        
+        "psr-4": {
+            "SimplePHP\\View\\": "/src"
+        }
     }
 }
