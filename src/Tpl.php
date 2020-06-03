@@ -60,6 +60,10 @@ class Tpl implements ArrayAccess {
         $this->_layout = $tpl;
     }
 
+    function setTemplate($tpl) {
+        $this->_tplName = $tpl;
+    }
+
     function getContent() {
         return $this->_content;
     }
@@ -73,6 +77,27 @@ class Tpl implements ArrayAccess {
         ob_start();
         include $filename;
         return ob_get_clean();
+    }
+
+    function renderContent($content) {
+        if (isset($this->_layout) && $this->_layout !== false) {
+            $layoutPath = $this->_layoutPath;
+            if (!isset($layoutPath) || $layoutPath === false || empty($layoutPath)) {
+                $tplPath = $this->_tplPath;
+                if (!isset($tplPath)) $tplPath = self::$_defaultTplPath;
+                if (!isset($tplPath)) throw new Exception('No template path specified');
+                if (!is_array($tplPath)) $tplPath = [$tplPath];                
+                $layoutPath = $tplPath;
+            }
+            $layoutTpl = new self($this->_layout, $layoutPath);
+            $layoutTpl->setData($this->_data);
+            $layoutTpl->_content = ''.$content;
+            $content = $layoutTpl->render();
+            if ($content === false) {
+                throw new Exception('Layout '.$this->_layout.' not found');
+            }
+        }
+        return $content;
     }
 
     function render($tpl = null) {
@@ -89,22 +114,9 @@ class Tpl implements ArrayAccess {
         foreach ($tplPath as $path) {            
             $filename = $path . DIRECTORY_SEPARATOR . $tpl . $this->_tplExt;
             if (file_exists($filename)) {
-                $content = $this->_renderFile($filename);
-                if (isset($this->_layout) && $this->_layout !== false) {
-                    $layoutPath = $this->_layoutPath;
-                    if (!isset($layoutPath) || $layoutPath === false || empty($layoutPath)) {
-                        $layoutPath = $tplPath;
-                    }
-                    $layoutTpl = new self($this->_layout, $layoutPath);
-                    $layoutTpl->setData($this->_data);
-                    $layoutTpl->_content = $content;
-                    $content = $layoutTpl->render();
-                    if ($content === false) {
-                        throw new Exception('Layout '.$this->_layout.' not found');
-                    }
-                }
+                $content = $this->_renderFile($filename);                
             }
-            
+            $content = $this->renderContent($content);            
         }
         return $content;
     }
